@@ -14,7 +14,7 @@
     <style>
         #content {
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
             align-items: flex-start;
         }
         #webcam-section, #upload-section {
@@ -171,30 +171,6 @@
 		<canvas id="canvas" style="display:none;"></canvas>
 		<div id="details-upload"></div>
             </div>
-
-            <!-- Map section -->
-            <div id="map-section">
-                <h4>Location</h4>
-
-        <!-- Dropdown for class filter -->
-        <div id="filter-container" class="text-center mb-4">
-            <label for="classFilter" class="form-label">Filter by Plant Class:</label>
-            <select id="classFilter" class="form-select w-50 mx-auto" onchange="filterMarkers()">
-                <option value="All">All</option>
-                <option value="Black Gold">Black Gold</option>
-                <option value="Black Prince Rubber Tree">Black Prince Rubber Tree</option>
-                <option value="Chameleon ZZ Plant">Chameleon ZZ Plant</option>
-                <option value="Donkey's Tail">Donkey's Tail</option>
-                <option value="Dwarf Kamuning Plant">Dwarf Kamuning Plant</option>
-                <option value="Fiddle Leaf Fig">Fiddle Leaf Fig</option>
-                <option value="Silver Lady">Silver Lady</option>
-                <option value="Tineke Rubber Tree">Tineke Rubber Tree</option>
-                <option value="Variegated Rhapis">Variegated Rhapis</option>
-                <option value="ZZ Raven">ZZ Raven</option>
-            </select>
-
-                <div id="map"></div>
-            </div>
         </div>
     </div>
 
@@ -202,7 +178,6 @@
     <script type="text/javascript">
         const URL = "./model/";
         let model, webcam, maxPredictions, scanOverlay, videoElement, canvasElement, canvasContext, latitude, longitude;
-        let map, markerLayer = L.layerGroup();  // Layer group for markers
         let allLocations = [];  // Store all fetched locations
 	let isPredicting = true, webcamInitialized = false;
 	const confidenceThreshold = 0.9975;
@@ -510,58 +485,6 @@
 	    isPredicting = false;  // Stop prediction loop for the webcam
 	}
 
-        // Add markers to the map for the given plant locations
-        function addMarkers(locations) {
-            markerLayer.clearLayers();  // Clear the existing markers
-            locations.forEach(location => {
-                const { className, latitude, longitude, timestamp, image } = location;
-
-                // Create popup content with className and image
-                const popupContent = `
-                    <strong>${className}</strong><br>
-		    Date and Time taken: ${timestamp}<br>
-                    Location: ${latitude}, ${longitude}<br>
-                    <img src="${image}" alt="${className}" style="width:100px;height:100px;">
-                `;
-
-                const marker = L.marker([latitude, longitude]).bindPopup(popupContent);
-                markerLayer.addLayer(marker);  // Add marker to layer group
-            });
-
-            markerLayer.addTo(map);  // Add all markers to the map
-        }
-
-        // Filter markers based on class selection
-        function filterMarkers() {
-            const selectedClass = document.getElementById("classFilter").value;
-
-            // If "All" is selected, show all markers
-            if (selectedClass === "All") {
-                addMarkers(allLocations);
-            } else {
-                const filteredLocations = allLocations.filter(location => location.className === selectedClass);
-                addMarkers(filteredLocations);
-            }
-        }
-
-// Fetch plant locations from MongoDB and add them to the map
-async function fetchPlantLocations() {
-    try {
-        const response = await fetch(fetchLocationsURL);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
-        const locations = await response.json();
-        console.log("Fetched plant locations:", locations);  // Debugging: log the locations
-        allLocations = locations;
-        addMarkers(allLocations);
-    } catch (error) {
-        console.error("Error fetching plant locations:", error);
-        alert("Could not load plant locations. Please try again later.");
-    } finally {
-        document.getElementById("map").classList.remove("loading");  // Hide loading indicator
-    }
-}
-
         // Toggle between Webcam and Image Upload
         function toggleScanMethod() {
             const selectedMethod = document.getElementById("scanMethod").value;
@@ -597,44 +520,7 @@ async function restartScan() {
         console.error("Error restarting webcam:", error);
     }
 }
-
-// Initialize the map with the user's location
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(position => {
-            latitude = position.coords.latitude;
-            longitude = position.coords.longitude;
-
-            // Initialize the map with the current coordinates
-            initMap(latitude, longitude);
-        }, showError, {
-            enableHighAccuracy: true,  // Ensure higher accuracy
-            timeout: 5000,
-            maximumAge: 0
-	});
-    } else {
-        document.getElementById("map").innerHTML = "Geolocation is not supported by this browser.";
-    }
-}
-
-        // Initialize the map and fetch plant locations
-        function initMap(latitude, longitude) {
-            map = L.map('map').setView([latitude, longitude], 13);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            L.marker([latitude, longitude]).addTo(map)
-	        .bindPopup(`You are here: ${latitude}, ${longitude}`)
-                .openPopup();
-
-    // Add the layer group to the map for storing plant markers
-    markerLayer.addTo(map);
-
-            fetchPlantLocations();  // Fetch plant locations
-        }
-
+	    
         function showError(error) {
             const map = document.getElementById("map");
             console.error("Geolocation error:", error);
