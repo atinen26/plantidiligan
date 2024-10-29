@@ -168,7 +168,7 @@
     <!-- JavaScript -->
     <script type="text/javascript">
         const URL = "./model/";
-        let model, webcam, maxPredictions, scanOverlay, videoElement, canvasElement, canvasContext, latitude, longitude;
+        let model, webcam, maxPredictions, scanOverlay, latitude, longitude;
         let allLocations = [];  // Store all fetched locations
 	let isPredicting = true, webcamInitialized = false;
 	const confidenceThreshold = 0.9975;
@@ -198,12 +198,6 @@
 	    console.log("Model loaded successfully.");
             maxPredictions = model.getTotalClasses();
         }
-
-	function startWebcamSection() {
-	    isPredicting = true;  // Allow webcam scanning
-	    stopWebcam();         // Stop any existing webcam instance
-	    initWebcam();         // Start the webcam if it’s not already initialized
-	}
 	
 	function startUploadSection() {
 	    stopWebcam();         // Stop the webcam if switching to the upload section
@@ -235,73 +229,6 @@
 	    };
 	    input.click();
 	});
-
-	function loop() {
-	    if (!isPredicting) return;  // Exit the loop if prediction is disabled
-	
-	    canvasContext.save();
-	    canvasContext.scale(-1, 1);
-	    canvasContext.drawImage(videoElement, -200, 0, 200, 200);
-	    canvasContext.restore();
-	
-	    predict();  // Run prediction on the current frame
-	    window.requestAnimationFrame(loop);  // Continue the loop
-	}
-
-        // Predict from webcam and capture data
-        async function predict() {
-	    if (!model || predictionInProgress || !isPredicting) return;
-	
-	    predictionInProgress = true;  // Set lock to prevent duplicate predictions
-		
-            const prediction = await model.predict(canvasElement);
-            const bestPrediction = prediction.reduce((max, p) => (p.probability > max.probability ? p : max), prediction[0]);
-
-            if (bestPrediction.probability >= confidenceThreshold) {
-		// Stop further predictions once the threshold is met
-        	isPredicting = false;
-		videoElement.pause();  // Freeze the webcam
-        	videoElement.srcObject.getTracks().forEach(track => track.stop());  // Stop the video stream
-        	document.getElementById("class-label").innerText = bestPrediction.className;
-
-                // Capture the image from the webcam
-                const image = canvasElement.toDataURL("image/jpeg");  // Capture the image in base64
-
-                // Get current timestamp and format it
-                const now = new Date();
-		const className = bestPrediction.className;
-                const timestamp = now.toLocaleDateString('en-US', {
-                    month: '2-digit',
-                    day: '2-digit',
-                    year: 'numeric'
-                }) + ", " + now.toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                });
-
-                // Display scan details (class name, description, coordinates)
-                displayDetails(className, timestamp, latitude, longitude, "details-webcam");
-
-                // Ensure we have the latest location coordinates before saving
-                if (latitude !== null && longitude !== null) {
-                    // Save the scan data to MongoDB
-                    saveScanData(bestPrediction.className, timestamp, latitude, longitude, image);
-                } else {
-                    alert("Unable to capture location. Please allow location access.");
-                }
-
-                // Get the city from coordinates
-                // getCity(latitude, longitude);
-
-                // Show the restart button
-                document.getElementById("restart-button").style.display = "block";
-
-	        // Hide the label container after scanning
-	        document.getElementById("label-container").style.display = "none";  // Hide the class label container
-            }
-	    predictionInProgress = false;  // Reset lock to allow new predictions in future scans
-        }
 
         // Display class name, description, date & time, coordinates
         function displayDetails(className, timestamp, latitude, longitude, sectionId) {
@@ -440,16 +367,14 @@
             const selectedMethod = document.getElementById("scanMethod").value;
 
             // Hide both sections first
-            document.getElementById("take-upload-section").style.display = "none";
+            document.getElementById("take-picture-section").style.display = "none";
             document.getElementById("upload-section").style.display = "none";
 
             // Show the appropriate section based on the selected method
             if (selectedMethod === "takePicture") {
                 document.getElementById("take-picture-section").style.display = "block";
-                startWebcamSection(); // Initialize the webcam section if selected
             } else if (selectedMethod === "upload") {
                 document.getElementById("upload-section").style.display = "block";
-		stopWebcam();         // Stop the webcam if switching to the upload section
             }
         }
 	    
@@ -473,23 +398,10 @@
             }
         }
 
-        // Event listener for Restart button
-        document.getElementById('restart-button').addEventListener('click', () => {
-            // Clear the displayed details
-            document.getElementById('details').innerHTML = '';
-            labelContainer.innerHTML = 'Scanning...';
-
-            // Hide the restart button
-            document.getElementById('restart-button').style.display = 'none';
-
-            // Restart the scanning process
-            window.requestAnimationFrame(loop);
-        });
-
-document.addEventListener("DOMContentLoaded", () => {
-    initModel();  // Load the model once
-    getLocation();  // Initialize the map and fetch locations
-});
+	document.addEventListener("DOMContentLoaded", () => {
+	    initModel();  // Load the model once
+	    getLocation();  // Initialize the map and fetch locations
+	});
 
     </script>
 
