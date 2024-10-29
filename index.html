@@ -93,10 +93,17 @@
 	    display: none; /* Hide until an image is uploaded */
 	}
 	#take-picture-button, .custom-upload-button {
-	    width: 80%;  /* Adjust width for mobile devices */
+	    display: inline-block;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    color: #fff;
+	    background-color: #007bff;
+	    border-radius: 5px;
+	    cursor: pointer;
+	    text-align: center;
+	    width: fit-content;
 	    margin: 10px 0;
-	}
-	
+	}	
 	#taken-image, #uploaded-image {
 	    max-width: 90vw;  /* Make sure images are responsive on small screens */
 	    height: auto;
