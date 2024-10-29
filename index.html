@@ -13,9 +13,8 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
         #content {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+	    flex-direction: column;
+	    align-items: center;
         }
         #upload-section {
             flex: 1;
@@ -75,6 +74,12 @@
         #details {
             margin-top: 20px;
         }
+	#take-picture-container {
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+            margin-bottom: 20px;
+	}
 	#upload-container {
 	    display: flex;
 	    justify-content: center;
@@ -87,36 +92,15 @@
 	#uploaded-image {
 	    display: none; /* Hide until an image is uploaded */
 	}
-	.custom-take-picture-button {
-	    display: inline-block;
-	    padding: 10px 20px;
-	    font-size: 16px;
-	    color: #fff;
-	    background-color: #007bff;
-	    border-radius: 5px;
-	    cursor: pointer;
-	    text-align: center;
-	    width: fit-content;
-	}	
-	.custom-take-picture-button:hover {
-	    background-color: #0056b3;
+	#take-picture-button, .custom-upload-button {
+	    width: 80%;  /* Adjust width for mobile devices */
+	    margin: 10px 0;
 	}
-	/* Style for the Choose File button */
-	.custom-upload-button {
-	    display: inline-block;
-	    padding: 10px 20px;
-	    font-size: 16px;
-	    color: #fff;
-	    background-color: #007bff;
-	    border-radius: 5px;
-	    cursor: pointer;
-	    text-align: center;
-	    width: fit-content;
-	}	
-	/* Hover effect */
-	.custom-upload-button:hover {
-	    background-color: #0056b3;
-	}	
+	
+	#taken-image, #uploaded-image {
+	    max-width: 90vw;  /* Make sure images are responsive on small screens */
+	    height: auto;
+	}
     </style>
 </head>
 
@@ -138,7 +122,10 @@
 		
 		<div id="take-picture-section" style="display: none;">
 		    <h4>Take a Picture</h4>
-		    <button id="take-picture-button" class="custom-take-picture-button">Take Picture</button>
+		    <div id="take-picture-container">
+			<button id="take-picture-button" class="custom-upload-button">Take Picture</label>
+			<input type="file" id="take-picture-input" accept="image/*" capture="environment" style="display: none;">
+		    </div>
 		    <div id="taken-image-container">
 			<img id="taken-image" alt="Taken picture" style="display: none; width: 200px; height: auto;">
 		    </div>
@@ -261,29 +248,25 @@
 	    }
 	}
 
-	document.getElementById("image-upload").addEventListener("change", handleImageUpload);
+	document.getElementById("take-picture-input").addEventListener("change", handleImage);	
+	document.getElementById("image-upload").addEventListener("change", handleImage);
 	
-	async function handleImageUpload() {
-	    const imageUpload = document.getElementById("image-upload").files[0];
-	    if (!imageUpload) return;
-
-	    isPredicting = true;  // Enable prediction for uploaded image
-	
-	    const reader = new FileReader();
-	    reader.onload = function (e) {
-	        const img = new Image();
-	        img.src = e.target.result;
-	        img.onload = function () {
-	            // Resize and display the uploaded image
-	            const resizedImage = resizeImage(img);
-	            document.getElementById("uploaded-image").src = resizedImage;
-	            document.getElementById("uploaded-image").style.display = "block";
-	
-	            // Run prediction on the original image
-	            predictImage(e.target.result);
+	function handleImage(event) {
+	    const file = event.target.files[0];
+	    if (file) {
+	        const reader = new FileReader();
+	        reader.onload = (e) => {
+	            const img = new Image();
+	            img.src = e.target.result;
+	            img.onload = () => {
+	                const resizedImage = resizeImage(img);
+	                document.getElementById("taken-image").src = resizedImage;
+	                document.getElementById("taken-image").style.display = "block";
+	                predictImage(e.target.result);  // Reuse the predictImage function
+	            };
 	        };
-	    };
-	    reader.readAsDataURL(imageUpload);
+	        reader.readAsDataURL(file);
+	    }
 	}
 	
 	function resizeImage(img) {
@@ -368,6 +351,9 @@
             // Show the appropriate section based on the selected method
             if (selectedMethod === "takePicture") {
                 document.getElementById("take-picture-section").style.display = "block";
+		document.getElementById("take-picture-button").addEventListener("click", () => {
+		    document.getElementById("take-picture-input").click();
+		});
             } else if (selectedMethod === "upload") {
                 document.getElementById("upload-section").style.display = "block";
             }
