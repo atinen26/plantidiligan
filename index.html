@@ -172,7 +172,7 @@
         // Display class name, description, date & time, coordinates
         function displayDetails(className, timestamp, latitude, longitude, sectionId) {
 	    console.log("displayDetails called with:", { className, timestamp, latitude, longitude, sectionId });
-            const details = document.getElementById(sectionId);
+            const details = document.getElementById("details");
             const description = plantDescriptions[className] || "Description not available.";
             details.innerHTML = `
                 <p><strong>Plant Name:</strong> ${className}</p>
@@ -213,15 +213,21 @@
 	        const reader = new FileReader();
 	        reader.onload = (e) => {
 	            const originalImageData = e.target.result; // Save the original image data
+		    console.log("Original image data loaded");
 	            const img = new Image();
-	            img.src = e.target.result;
+	            img.src = originalImageData;
 	            img.onload = () => {
+			// Display the resized version of the image
+               		const resizedImage = resizeImage(img);
 	                document.getElementById("uploaded-image").src = resizedImage;
 	                document.getElementById("uploaded-image").style.display = "block";
+			console.log("Resized image displayed");
 	                predictImage(resizedImage);  // Reuse the predictImage function
 	            };
 	        };
 	        reader.readAsDataURL(file);
+	    } else {
+	        console.error("No file selected or file reading error");
 	    }
 	}
 	
@@ -242,12 +248,14 @@
 	    canvas.width = width;
 	    canvas.height = height;
 	    ctx.drawImage(img, 0, 0, width, height);
+	    console.log("Image resized for display only");
 	    return canvas.toDataURL("image/jpeg");
 	}
 	
-	async function predictImage(originalImageData) {
+	async function predictImage(imageData) {
+	    console.log("Predicting image...");
 	    const img = new Image();
-	    img.src = originalImageData;
+	    img.src = imageData;
 	    img.onload = async () => {
 	        const canvas = document.getElementById("canvas");
 	        const ctx = canvas.getContext("2d");
@@ -275,7 +283,8 @@
 	                        minute: '2-digit',
 	                        hour12: true
 	                    });	                
-	
+
+			console.log("Prediction completed:", prediction);
 	                // Display prediction details
 	                displayDetails(className, timestamp, latitude, longitude, "details");
 	                
@@ -315,8 +324,14 @@
             }
         }
 
-	document.addEventListener("DOMContentLoaded", () => {
-	    initModel();  // Load the model once
+	// Ensure model is loaded
+	document.addEventListener("DOMContentLoaded", async () => {
+	    try {
+	        model = await tmImage.load("./model/model.json", "./model/metadata.json");
+	        console.log("Model loaded successfully");
+	    } catch (error) {
+	        console.error("Model loading error:", error);
+	    }
 	});
 
     </script>
