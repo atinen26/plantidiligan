@@ -133,8 +133,9 @@
     <!-- JavaScript -->
     <script type="text/javascript">
         const URL = "./model/";
-        let model, webcam, maxPredictions, scanOverlay, latitude, longitude;
-        let allLocations = [];  // Store all fetched locations
+        let model, webcam, maxPredictions, scanOverlay;
+	let latitude = null;
+	let longitude = null;
 	let isPredicting = true, webcamInitialized = false;
 	const confidenceThreshold = 0.9975;
 	let labelContainer = document.getElementById("class-label");
@@ -305,6 +306,26 @@
 	        }
 	    };
 	}
+
+	// Get user’s location
+	function getLocation() {
+	    if (navigator.geolocation) {
+	        navigator.geolocation.getCurrentPosition(
+	            (position) => {
+	                latitude = position.coords.latitude;
+	                longitude = position.coords.longitude;
+	                console.log("Location retrieved:", latitude, longitude);
+	            },
+	            (error) => {
+	                console.error("Error fetching location:", error);
+	                alert("Error fetching location. Please allow location access.");
+	            }
+	        );
+	    } else {
+	        console.error("Geolocation is not supported by this browser.");
+	        alert("Geolocation is not supported by this browser.");
+	    }
+	}
 	    
         function showError(error) {
             const map = document.getElementById("map");
@@ -329,6 +350,7 @@
 	// Ensure model is loaded
 	document.addEventListener("DOMContentLoaded", async () => {
 	    try {
+		await getLocation(); // Get location at startup
 	        model = await tmImage.load("./model/model.json", "./model/metadata.json");
 	        console.log("Model loaded successfully");
 	    } catch (error) {
