@@ -170,8 +170,8 @@
 	}
 
         // Display class name, description, date & time, coordinates
-        function displayDetails(className, timestamp, latitude, longitude, sectionId) {
-	    console.log("displayDetails called with:", { className, timestamp, latitude, longitude, sectionId });
+        function displayDetails(className, timestamp, latitude, longitude) {
+	    console.log("displayDetails called with:", { className, timestamp, latitude, longitude});
             const details = document.getElementById("details");
             const description = plantDescriptions[className] || "Description not available.";
             details.innerHTML = `
@@ -254,10 +254,10 @@
 	    return canvas.toDataURL("image/jpeg");
 	}
 	
-	async function predictImage(imageData) {
+	async function predictImage(originalImageData) {
 	    console.log("Predicting image...");
 	    const img = new Image();
-	    img.src = imageData;
+	    img.src = originalImageData;
 	    img.onload = async () => {
 	        const canvas = document.getElementById("canvas");
 	        const ctx = canvas.getContext("2d");
