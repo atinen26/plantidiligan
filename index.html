@@ -175,13 +175,19 @@
 	    console.log("displayDetails called with:", { className, timestamp, latitude, longitude});
             const details = document.getElementById("details");
             const description = plantDescriptions[className] || "Description not available.";
+	    // Create a Google Maps link using the coordinates
+	    const mapsLink = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
             details.innerHTML = `
                 <p><strong>Plant Name:</strong> ${className}</p>
                 <p><strong>Description:</strong> ${description}</p>
                 <p><strong>Date & Time:</strong> ${timestamp}</p>
-                <p><strong>Coordinates:</strong> ${latitude}, ${longitude}</p>
+                <p><strong>Coordinates:</strong>
+			<a href="${mapsLink}" target="_blank" rel="noopener noreferrer">
+		        	${latitude}, ${longitude}
+		        </a>
+  		</p>
             `;
-	    console.log("Displaying details:", details.innerHTML);  // Debugging output
+	    console.log("Displaying details with map link:", details.innerHTML);  // Debugging output
         }
 
 	// Change the URLs for saving scan data and fetching plant locations
