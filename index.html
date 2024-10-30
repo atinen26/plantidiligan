@@ -124,6 +124,8 @@
 		<div id="resized-image-container">
 			<img id="uploaded-image" alt="Resized display image" style="display: none; width: 200px; height: auto;">
 		</div>
+		<!-- Loading message -->
+		<div id="loading-message" style="display: none; text-align: center; font-size: 18px; color: gray;">Loading...</div>
 		<canvas id="canvas" style="display:none;"></canvas>
 		<div id="details"></div>
             </div>
@@ -223,6 +225,9 @@
 		    console.log("Original image data loaded");
 	            // Display the original image quickly
 	            displayImage(originalImageData);
+
+	            // Show loading message
+	            document.getElementById("loading-message").style.display = "block";
 	
 	            // Run prediction on the original image
 	            predictImage(originalImageData);
@@ -294,6 +299,8 @@
 	                    });	                
 
 			console.log("Prediction completed:", prediction);
+			// Hide loading message after prediction is done
+                	document.getElementById("loading-message").style.display = "none";
 	                // Display prediction details
 	                displayDetails(className, timestamp, latitude, longitude, "details");
 	                
@@ -306,9 +313,11 @@
 	                }
 	            } else {
 	                console.log("Prediction failed.");
+			document.getElementById("loading-message").style.display = "none";
 	            }
 	        } catch (error) {
 	            console.error("Error during prediction:", error);
+		    document.getElementById("loading-message").style.display = "none";
 	        }
 	    };
 	}
