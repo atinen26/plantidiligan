@@ -214,21 +214,23 @@
 	        reader.onload = (e) => {
 	            const originalImageData = e.target.result; // Save the original image data
 		    console.log("Original image data loaded");
-	            const img = new Image();
-	            img.src = originalImageData;
-	            img.onload = () => {
-			// Display the resized version of the image
-               		const resizedImage = resizeImage(img);
-	                document.getElementById("uploaded-image").src = resizedImage;
-	                document.getElementById("uploaded-image").style.display = "block";
-			console.log("Resized image displayed");
-	                predictImage(resizedImage);  // Reuse the predictImage function
-	            };
+	            // Display the original image quickly
+	            displayImage(originalImageData);
+	
+	            // Run prediction on the original image
+	            predictImage(originalImageData);
 	        };
 	        reader.readAsDataURL(file);
 	    } else {
 	        console.error("No file selected or file reading error");
 	    }
+	}
+
+	// Display the image immediately, and resize only for display after prediction starts
+	function displayImage(imageData) {
+	    document.getElementById("uploaded-image").src = imageData;
+	    document.getElementById("uploaded-image").style.display = "block";
+	    console.log("Original image displayed");
 	}
 	
 	function resizeImage(img) {
