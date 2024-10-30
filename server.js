@@ -1,7 +1,6 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const bodyParser = require('body-parser');
-const axios = require('axios');  // Ensure axios is installed
 const helmet = require('helmet');
 const cors = require('cors');
 
