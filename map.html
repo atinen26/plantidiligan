@@ -99,11 +99,9 @@
             fetchUserLocation();
         }
 
-        // Fetch plant locations from the backend API (update the URL to your backend)
-        const fetchLocationsURL = 'https://plantrecognitionapp-mobile.onrender.com/plant-locations';
-
         async function fetchPlantLocations() {
             try {
+                const fetchLocationsURL = 'https://plantrecognitionapp-mobile.onrender.com/plant-locations';
                 const response = await fetch(fetchLocationsURL);
                 if (!response.ok) throw new Error('Failed to fetch plant locations');
                 
