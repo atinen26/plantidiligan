@@ -18,10 +18,18 @@
             text-align: center;
             margin-top: 20px;
         }
+        #loading-message {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Plant Markers</h1>
+    <div id="loading-message" style="display: block;">Loading markers...</div>
     <div id="map"></div>
 
     <script>
@@ -44,7 +52,7 @@
         // Add "You are here" marker for the redirected location
         L.marker([lat, lng])
             .addTo(map)
-            .bindPopup('You are here')
+            .bindPopup('You are here.')
             .openPopup();
 
         // Fetch plant locations from the backend API (update the URL to your backend)
@@ -68,6 +76,8 @@
                     `;
                     L.marker([latitude, longitude]).bindPopup(popupContent).addTo(map);
                 });
+                // Hide the loading message after markers are added
+                document.getElementById("loading-message").style.display = "none";
             } catch (error) {
                 console.error('Error fetching plant locations:', error);
                 alert('Could not load plant locations.');
