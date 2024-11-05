@@ -161,9 +161,7 @@
 	const confidenceThreshold = 0.9975;
 	let labelContainer = document.getElementById("class-label");
 	let predictionInProgress = false;  // New lock for avoiding concurrent predictions
-	let scanDataToSave = null; // Temporary storage for scan data
-
-        // Plant descriptions for each class
+	let scanDataToSave = null;
         const plantDescriptions = {
             "Black Gold": "The <i>Black Gold</i> plant, often associated with the Snake Plant (Sansevieria), is characterized by its tall, upright leaves with deep green interiors and bright yellow or golden edges. It is a hardy, low-maintenance plant, popular for indoor spaces due to its tolerance for low light and drought conditions.",
             "Black Prince Rubber Tree": "The <i>Black Prince</i> Rubber Tree (Ficus elastica 'Black Prince') is a striking indoor plant with large, glossy, dark burgundy leaves that can appear almost black under certain lighting. This variety of the Rubber Tree is known for its bold appearance and ability to thrive in bright, indirect light. It's a great choice for those looking for an eye-catching focal point in their plant collection.",
@@ -177,8 +175,7 @@
             "ZZ Raven": "The <i>ZZ Raven</i> (Zamioculcas zamiifolia 'Raven') is a stunning, dark-leaved variety of the ZZ Plant. Its new growth starts out bright green, then gradually turns a rich, near-black shade as the leaves mature. Like its relatives, the ZZ Raven is very low-maintenance, thriving in low light and requiring infrequent watering.",
 	    "Non-Plant Object": "This object is not identified as a plant. Please ensure the object is a plant for accurate results."
         };
-
-        document.getElementById("model-loading-message").style.display = "block";
+	document.getElementById("model-loading-message").style.display = "block";
 	    
         async function initModel() {
             const modelURL = URL + "model.json";
@@ -186,7 +183,6 @@
 
             model = await tmImage.load(modelURL, metadataURL);
 	    console.log("Model loaded successfully.");
-	    document.getElementById("model-loading-message").style.display = "none";
             maxPredictions = model.getTotalClasses();
         }
 	
@@ -431,6 +427,7 @@
 		await getLocation(); // Get location at startup
 	        model = await tmImage.load("./model/model.json", "./model/metadata.json");
 	        console.log("Model loaded successfully");
+		document.getElementById("model-loading-message").style.display = "none";
 	    } catch (error) {
 	        console.error("Model loading error:", error);
 	    }
