@@ -198,7 +198,7 @@
             const details = document.getElementById("details");
             const description = plantDescriptions[className] || "Description not available.";
 	    // Create a Google Maps link using the coordinates
-	    const mapsLink = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+	    const mapsLink = `map.html?lat=${latitude}&lng=${longitude}`;
             details.innerHTML = `
                 <p><strong>Plant Name:</strong> ${className}</p>
                 <p><strong>Description:</strong> ${description}</p>
