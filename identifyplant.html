@@ -138,6 +138,7 @@
 			<input type="file" id="image-upload" accept="image/*" style="display: none;">
 	    	</div>
 		<div id="resized-image-container">
+			<div id="image-loading-message" style="display: none; text-align: center; font-size: 18px; color: gray;">Loading image...</div>
 			<img id="uploaded-image" alt="Resized display image" style="display: none; width: 200px; height: auto;">
 		</div>
 		<div id="loading-message" style="display: none; text-align: center; font-size: 18px; color: gray;">Loading predictions...</div>
@@ -254,11 +255,12 @@
 	    }
 	}
 
-	// Display the image immediately, and resize only for display after prediction starts
 	function displayImage(imageData) {
+	    document.getElementById("image-loading-message").style.display = "block";
 	    document.getElementById("uploaded-image").src = imageData;
 	    document.getElementById("uploaded-image").style.display = "block";
 	    console.log("Original image displayed");
+	    document.getElementById("image-loading-message").style.display = "none";
 	}
 	
 	function resizeImage(img) {
@@ -345,7 +347,7 @@
 	}
 
 	function displayWarning() {
-	    // Show a warning message to the user
+	    document.getElementById("loading-message").style.display = "none";
 	    const detailsContainer = document.getElementById("details");
 	    detailsContainer.innerHTML = `
 	        <p style="color: red;"><strong>Warning:</strong> This object is not identified as a plant. Please upload a plant image.</p>
