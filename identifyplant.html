@@ -56,18 +56,14 @@
             display: none;
             margin-top: 20px;
         }
-        /* Center the uploaded image */
         #upload-section img {
             display: block;
-            margin: 0 auto; /* Center the image */
+            margin: 0 auto;
         }
         @keyframes scan-animation {
             0% { background-color: rgba(0, 255, 0, 0.1); }
             50% { background-color: rgba(0, 255, 0, 0.5); }
             100% { background-color: rgba(0, 255, 0, 0.1); }
-        }
-        #filter-container {
-            margin-bottom: 20px;
         }
         #details {
             margin-top: 20px;
@@ -126,14 +122,20 @@
         .logo {
             width: 300px; /* Set the logo width */
             height: auto;  /* Maintain aspect ratio */
-	    align: center;
         }
+	.container {
+	    display: flex;
+	    justify-content: center; /* Center horizontally */
+	    align-items: center;     /* Center vertically */
+	}
     </style>
 </head>
 
 <body>
     <div class="container mt-5">
-        <img src="img/logo.png" alt="Dashboard Logo" class="logo">
+	<div class="container">
+        	<img src="img/logo.png" alt="Dashboard Logo" class="logo">
+	</div>
         <div id="content">
             <!-- Image upload section -->
             <div id="upload-section">
