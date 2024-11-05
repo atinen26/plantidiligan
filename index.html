@@ -305,6 +305,13 @@
 	            if (bestPrediction) {
 			isPredicting = false;
 			const className = bestPrediction.className;
+
+	                // If it's a non-plant object, show a warning message
+	                if (className === "Non-Plant Object") {
+	                    displayWarning();
+	                    return;  // Stop further processing
+	                }
+			    
 			const image = originalImageData;
 	                const now = new Date();
 	                const timestamp = now.toLocaleDateString('en-US', {
@@ -338,6 +345,23 @@
 		    document.getElementById("loading-message").style.display = "none";
 	        }
 	    };
+	}
+
+	function displayWarning() {
+	    // Show a warning message to the user
+	    const detailsContainer = document.getElementById("details");
+	    detailsContainer.innerHTML = `
+	        <p style="color: red;"><strong>Warning:</strong> This object is not identified as a plant. Please upload a plant image.</p>
+	    `;
+	
+	    // Hide the save button since the object is not a plant
+	    document.getElementById("save-button").style.display = "none";
+	
+	    // Reset the file input so the user can upload a new image
+	    document.getElementById("image-upload").value = "";  // Clears the file input
+	
+	    // Optionally: Scroll to the top to focus attention on the warning
+	    window.scrollTo(0, 0);
 	}
 
 	document.getElementById("save-button").addEventListener("click", async function() {
