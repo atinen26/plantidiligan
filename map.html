@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map with Plant Markers</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
@@ -21,16 +22,21 @@
         #loading-message {
             text-align: center;
             font-size: 18px;
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 10px;
+            color: gray;
         }
     </style>
 </head>
-<body>
+<body class="container">
     <h1>Plant Markers</h1>
     <div id="loading-message" style="display: block;">Loading markers...</div>
-    <div id="map"></div>
+    <div id="map" class="my-4"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <!-- Bootstrap JS (copied from index.html) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         // Function to get query parameters (latitude and longitude)
