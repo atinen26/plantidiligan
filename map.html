@@ -52,21 +52,52 @@
             return parseFloat(urlParams.get(param));
         }
 
-        // Get latitude and longitude from the URL
-        const lat = getQueryParam('lat') || 0;
-        const lng = getQueryParam('lng') || 0;
+        // Function to initialize the map
+        function initializeMap(lat, lng, message = 'You are here') {
+            map = L.map('map').setView([lat, lng], 13);  // Set map center
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
 
-        // Initialize the map centered on the passed coordinates
-        const map = L.map('map').setView([lat, lng], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+            // Add marker (for either user or plant location)
+            userMarker = L.marker([lat, lng]).addTo(map).bindPopup(message).openPopup();
 
-        // Add "You are here" marker for the redirected location
-        L.marker([lat, lng])
-            .addTo(map)
-            .bindPopup('You are here.')
-            .openPopup();
+            // Fetch plant locations
+            fetchPlantLocations();
+        }
+
+        // Function to fetch user's location
+        function fetchUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        initializeMap(lat, lng, 'You are here');  // Initialize map with user's location
+                    },
+                    error => {
+                        console.error('Error fetching location:', error);
+                        alert('Could not retrieve your location. Default location will be used.');
+                        initializeMap(0, 0);  // Default to (0, 0) if location access is denied or fails
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+                initializeMap(0, 0);  // Default to (0, 0) if Geolocation is not supported
+            }
+        }
+
+        // Check if we have predicted plant coordinates from the URL
+        const predictedLat = getQueryParam('lat');
+        const predictedLng = getQueryParam('lng');
+
+        if (!isNaN(predictedLat) && !isNaN(predictedLng)) {
+            // If coordinates are passed, use them for the map
+            initializeMap(predictedLat, predictedLng, 'Plant location');  // Use plant's predicted location
+        } else {
+            // If no coordinates are passed, fetch the user's current location
+            fetchUserLocation();
+        }
 
         // Fetch plant locations from the backend API (update the URL to your backend)
         const fetchLocationsURL = 'https://plantrecognitionapp.onrender.com/plant-locations';
@@ -96,9 +127,6 @@
                 alert('Could not load plant locations.');
             }
         }
-
-        // Fetch and display plant markers
-        fetchPlantLocations();
     </script>
 </body>
 </html>
