@@ -107,6 +107,20 @@
 	    max-width: 90vw;  /* Make sure images are responsive on small screens */
 	    height: auto;
 	}
+	.custom-save-button {
+	    display: inline-block;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    color: #fff;
+	    background-color: #28a745;
+	    border-radius: 5px;
+	    cursor: pointer;
+	    text-align: center;
+	    margin-top: 20px;
+	}	
+	.custom-save-button:hover {
+	    background-color: #218838;
+	}
     </style>
 </head>
 
@@ -128,6 +142,10 @@
 		<div id="loading-message" style="display: none; text-align: center; font-size: 18px; color: gray;">Loading predictions...</div>
 		<canvas id="canvas" style="display:none;"></canvas>
 		<div id="details"></div>
+
+		<!-- Save button, initially hidden -->
+		<button id="save-button" style="display:none;" class="custom-save-button">Save to Database</button>
+		<p id="save-status" style="display:none;"></p> <!-- Success message after saving -->
             </div>
         </div>
     </div>
@@ -142,19 +160,21 @@
 	const confidenceThreshold = 0.9975;
 	let labelContainer = document.getElementById("class-label");
 	let predictionInProgress = false;  // New lock for avoiding concurrent predictions
+	let scanDataToSave = null; // Temporary storage for scan data
 
         // Plant descriptions for each class
         const plantDescriptions = {
-            "Black Gold": "Black Gold is known for its dark green and yellow variegated leaves.",
-            "Black Prince Rubber Tree": "The Black Prince Rubber Tree is a popular indoor plant with dark, shiny leaves.",
-            "Chameleon ZZ Plant": "The Chameleon ZZ Plant changes its color from green to yellow under certain conditions.",
-            "Donkey's Tail": "Donkey's Tail is a trailing succulent plant with small, plump leaves.",
-            "Dwarf Kamuning Plant": "Dwarf Kamuning is a small evergreen shrub with fragrant white flowers.",
-            "Fiddle Leaf Fig": "The Fiddle Leaf Fig is a large indoor plant with large, violin-shaped leaves.",
-            "Silver Lady": "Silver Lady is a compact plant with silver-striped leaves.",
-            "Tineke Rubber Tree": "The Tineke Rubber Tree has attractive variegated leaves of green, white, and pink.",
-            "Variegated Rhapis": "Variegated Rhapis is a slow-growing palm with variegated green and yellow leaves.",
-            "ZZ Raven": "ZZ Raven is known for its glossy, dark purple-black foliage."
+            "Black Gold": "The <i>Black Gold</i> plant, often associated with the Snake Plant (Sansevieria), is characterized by its tall, upright leaves with deep green interiors and bright yellow or golden edges. It is a hardy, low-maintenance plant, popular for indoor spaces due to its tolerance for low light and drought conditions.",
+            "Black Prince Rubber Tree": "The <i>Black Prince</i> Rubber Tree (Ficus elastica 'Black Prince') is a striking indoor plant with large, glossy, dark burgundy leaves that can appear almost black under certain lighting. This variety of the Rubber Tree is known for its bold appearance and ability to thrive in bright, indirect light. It's a great choice for those looking for an eye-catching focal point in their plant collection.",
+            "Chameleon ZZ Plant": "The <i>Chameleon ZZ</i> Plant (Zamioculcas zamiifolia) is a unique cultivar that exhibits changing leaf colors. The new growth starts out in a bright, lime-green shade, gradually deepening to a rich emerald. Like the traditional ZZ Plant, it's highly resilient, thriving in low light and needing very little water.",
+            "Donkey's Tail": "<i>Donkey’s Tail</i> (Sedum morganianum) is a popular succulent known for its trailing stems, which can grow up to two feet long. The fleshy, tear-shaped leaves are a soft blue-green and can easily fall off when handled, making it a delicate yet beautiful plant often used in hanging baskets or as a cascading accent in arrangements.",
+            "Dwarf Kamuning Plant": "The <i>Dwarf Kamuning</i> (Murraya paniculata var. 'Dwarf') is a compact, evergreen shrub known for its small, glossy leaves and fragrant white flowers. This dwarf variety is ideal for hedges or as a decorative bonsai, with its dense growth and ability to be easily shaped through pruning.",
+            "Fiddle Leaf Fig": "The <i>Fiddle Leaf Fig</i> (Ficus lyrata) is a highly popular houseplant, admired for its large, violin-shaped leaves that can grow up to 12 inches long. It's a dramatic and stylish plant, often used to make a bold statement in modern interiors. It thrives in bright, indirect light but can be finicky about water and humidity levels.",
+            "Silver Lady": "<i>Silver Lady</i> (Blechnum gibbum) is a compact fern known for its elegant, silver-green fronds. It’s a tropical plant that adds a delicate, airy touch to any space. This plant thrives in moist, shaded environments, making it an ideal choice for indoor gardens or low-light areas.",
+            "Tineke Rubber Tree": "The <i>Tineke</i> Rubber Tree (Ficus elastica 'Tineke') is a variegated variety of the Rubber Tree, featuring large, thick leaves with a creamy-white margin and splashes of light green, pink, and white in the center. It’s an attractive and hardy plant that can grow quite large indoors with the right care.",
+            "Variegated Rhapis": "The <i>Variegated Rhapis</i> (Rhapis excelsa 'Variegata') is a slow-growing palm known for its fan-like fronds, which are striped with shades of green and creamy white. It’s a popular ornamental plant for indoor settings due to its unique appearance and ability to tolerate lower light levels.",
+            "ZZ Raven": "The <i>ZZ Raven</i> (Zamioculcas zamiifolia 'Raven') is a stunning, dark-leaved variety of the ZZ Plant. Its new growth starts out bright green, then gradually turns a rich, near-black shade as the leaves mature. Like its relatives, the ZZ Raven is very low-maintenance, thriving in low light and requiring infrequent watering.",
+	    "Non-Plant Object": "This object is not identified as a plant. Please ensure the object is a plant for accurate results."
         };
 
         // Load the image model and setup the webcam or map
@@ -197,9 +217,8 @@
 	const fetchLocationsURL = `https://plantrecognitionapp-mobile.onrender.com/plant-locations`;
 	
 	// Save the scanned data to MongoDB via a backend API
-	async function saveScanData(className, timestamp, latitude, longitude, image) {
+	async function saveScanData(scanData) {
 	    try {
-		const scanData = { className, timestamp, latitude, longitude, image };
 	        const response = await fetch(saveScanURL, {
 	            method: 'POST',
 	            headers: { 'Content-Type': 'application/json' },
@@ -304,13 +323,12 @@
 	                // Display prediction details
 	                displayDetails(className, timestamp, latitude, longitude, "details");
 	                
-	                // Ensure we have the latest location coordinates before saving
-	                if (latitude !== null && longitude !== null) {
-	                    // Save the scan data to MongoDB
-	                    saveScanData(className, timestamp, latitude, longitude, image);
-	                } else {
-	                    alert("Unable to capture location. Please allow location access.");
-	                }
+	                // Prepare the data to be saved but do not save yet
+	                scanDataToSave = { className, timestamp, latitude, longitude, image };
+	
+	                // Show the Save button
+	                document.getElementById("save-button").style.display = "inline-block";
+	                document.getElementById("save-status").style.display = "none";  // Hide the status message if shown
 	            } else {
 	                console.log("Prediction failed.");
 			document.getElementById("loading-message").style.display = "none";
@@ -321,6 +339,21 @@
 	        }
 	    };
 	}
+
+	document.getElementById("save-button").addEventListener("click", async function() {
+	    if (scanDataToSave) {
+	        try {
+	            await saveScanData(scanDataToSave);  // Save data to MongoDB
+	            document.getElementById("save-status").innerText = "Saved to database.";  // Show success message
+	            document.getElementById("save-status").style.display = "block";
+	            document.getElementById("save-button").style.display = "none";  // Hide the Save button
+	        } catch (error) {
+	            console.error("Error saving scan data:", error);
+	            document.getElementById("save-status").innerText = "Failed to save data. Please try again.";
+	            document.getElementById("save-status").style.display = "block";
+	        }
+	    }
+	});
 
 	// Get user’s location
 	function getLocation() {
