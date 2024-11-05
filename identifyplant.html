@@ -175,7 +175,6 @@
             "ZZ Raven": "The <i>ZZ Raven</i> (Zamioculcas zamiifolia 'Raven') is a stunning, dark-leaved variety of the ZZ Plant. Its new growth starts out bright green, then gradually turns a rich, near-black shade as the leaves mature. Like its relatives, the ZZ Raven is very low-maintenance, thriving in low light and requiring infrequent watering.",
 	    "Non-Plant Object": "This object is not identified as a plant. Please ensure the object is a plant for accurate results."
         };
-	document.getElementById("model-loading-message").style.display = "block";
 	    
         async function initModel() {
             const modelURL = URL + "model.json";
@@ -421,10 +420,10 @@
             }
         }
 
-	// Ensure model is loaded
 	document.addEventListener("DOMContentLoaded", async () => {
 	    try {
-		await getLocation(); // Get location at startup
+		await getLocation();
+		document.getElementById("model-loading-message").style.display = "block";
 	        model = await tmImage.load("./model/model.json", "./model/metadata.json");
 	        console.log("Model loaded successfully");
 		document.getElementById("model-loading-message").style.display = "none";
