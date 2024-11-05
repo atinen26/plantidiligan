@@ -132,6 +132,7 @@
             <div id="upload-section">
 		<a href="index.html"><img src="img/logo.png" alt="Dashboard Logo" class="logo"></a>
 		<h4>Upload or Take a Picture</h4>
+		<div id="model-loading-message" style="display: none; text-align: center; font-size: 18px; color: gray;">Loading model... This will take less than a minute when first loaded.</div>
 	    	<div id="upload-container">
 			<label for="image-upload" class="custom-upload-button">Choose File</label>
 			<input type="file" id="image-upload" accept="image/*" style="display: none;">
@@ -139,7 +140,6 @@
 		<div id="resized-image-container">
 			<img id="uploaded-image" alt="Resized display image" style="display: none; width: 200px; height: auto;">
 		</div>
-		<!-- Loading message -->
 		<div id="loading-message" style="display: none; text-align: center; font-size: 18px; color: gray;">Loading predictions...</div>
 		<canvas id="canvas" style="display:none;"></canvas>
 		<div id="details"></div>
@@ -178,13 +178,15 @@
 	    "Non-Plant Object": "This object is not identified as a plant. Please ensure the object is a plant for accurate results."
         };
 
-        // Load the image model and setup the webcam or map
+        document.getElementById("model-loading-message").style.display = "block";
+	    
         async function initModel() {
             const modelURL = URL + "model.json";
             const metadataURL = URL + "metadata.json";
 
             model = await tmImage.load(modelURL, metadataURL);
 	    console.log("Model loaded successfully.");
+	    document.getElementById("model-loading-message").style.display = "none";
             maxPredictions = model.getTotalClasses();
         }
 	
