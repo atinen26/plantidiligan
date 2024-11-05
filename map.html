@@ -32,7 +32,7 @@
 </head>
 <body class="container">
     <a href="index.html"><img src="img/logo.png" alt="Dashboard Logo" class="logo"></a>
-    <h4 class="mb-4 text-center">Plant Markers</h4>
+    <h4 class="mb-4 text-center">Plant Markers Map</h4>
     <div id="loading-message" style="display: block;">Loading markers...</div>
     <div id="map" class="my-4"></div>
 
@@ -44,6 +44,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        let map, userMarker;
+        
         // Function to get query parameters (latitude and longitude)
         function getQueryParam(param) {
             const urlParams = new URLSearchParams(window.location.search);
