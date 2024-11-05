@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map with Plant Markers</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Plant Markers</h1>
+    <div id="map"></div>
+
+    <script>
+        // Function to get query parameters (latitude and longitude)
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return parseFloat(urlParams.get(param));
+        }
+
+        // Get latitude and longitude from the URL
+        const lat = getQueryParam('lat') || 0;
+        const lng = getQueryParam('lng') || 0;
+
+        // Initialize the map centered on the passed coordinates
+        const map = L.map('map').setView([lat, lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Fetch plant locations from the backend API (update the URL to your backend)
+        const fetchLocationsURL = 'https://plantrecognitionapp.onrender.com/plant-locations';
+
+        async function fetchPlantLocations() {
+            try {
+                const response = await fetch(fetchLocationsURL);
+                if (!response.ok) throw new Error('Failed to fetch plant locations');
+                
+                const locations = await response.json();
+
+                // Add markers to the map
+                locations.forEach(location => {
+                    const { className, latitude, longitude, timestamp, image } = location;
+                    const popupContent = `
+                        <strong>${className}</strong><br>
+                        Date and Time taken: ${timestamp}<br>
+                        Location: ${latitude}, ${longitude}<br>
+                        <img src="${image}" alt="${className}" style="width:100px;height:100px;">
+                    `;
+                    L.marker([latitude, longitude]).bindPopup(popupContent).addTo(map);
+                });
+            } catch (error) {
+                console.error('Error fetching plant locations:', error);
+                alert('Could not load plant locations.');
+            }
+        }
+
+        // Fetch and display plant markers
+        fetchPlantLocations();
+    </script>
+</body>
+</html>
