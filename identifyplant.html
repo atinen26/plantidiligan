@@ -213,9 +213,8 @@
 	    console.log("Displaying details with map link:", details.innerHTML);  // Debugging output
         }
 
-	// Change the URLs for saving scan data and fetching plant locations
+	// Change the URL for saving scan data
 	const saveScanURL = `https://plantrecognitionapp-mobile.onrender.com/save-scan`;
-	const fetchLocationsURL = `https://plantrecognitionapp-mobile.onrender.com/plant-locations`;
 	
 	// Save the scanned data to MongoDB via a backend API
 	async function saveScanData(scanData) {
