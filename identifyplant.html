@@ -55,6 +55,7 @@
         #uploaded-image {
             display: none;
             margin-top: 20px;
+	    padding: 15px;
         }
         #upload-section img {
             display: block;
@@ -67,7 +68,11 @@
         }
         #details {
             margin-top: 20px;
+	    padding: 15px;
         }
+	#details p {
+	    line-height: 1.5;
+	}
 	#take-picture-container {
 	    display: flex;
 	    justify-content: center;
@@ -134,12 +139,12 @@
 		<h4>Upload or Take a Picture</h4>
 		<div id="model-loading-message" style="display: none; text-align: center; font-size: 18px; color: gray;">Loading model... This may take less than a minute when first loaded.</div>
 	    	<div id="upload-container">
-			<label for="image-upload" class="custom-upload-button">Choose File</label>
+			<label for="image-upload" class="custom-upload-button">Upload Image</label>
 			<input type="file" id="image-upload" accept="image/*" style="display: none;">
 	    	</div>
 		<div id="resized-image-container">
 			<div id="image-loading-message" style="display: none; text-align: center; font-size: 18px; color: gray;">Loading image...</div>
-			<img id="uploaded-image" alt="Resized display image" style="display: none; width: 200px; height: auto;">
+			<img id="uploaded-image" src="img/placeholder.png" alt="Image will appear here" style="display: none; width: 200px; height: auto;">
 		</div>
 		<div id="loading-message" style="display: none; text-align: center; font-size: 18px; color: gray;">Loading predictions...</div>
 		<canvas id="canvas" style="display:none;"></canvas>
