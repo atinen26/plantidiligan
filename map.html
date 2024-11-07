@@ -16,10 +16,12 @@
         #loading-message {
             text-align: center;
             font-size: 18px;
-            color: gray;
+            font-weight: bold;
+            color: #555;
+            margin-top: 20px;
         }
         body {
-            background-color: #f8f9fa; /* Light background for dashboard */
+            background-color: #e3f2fd;
         }
         .logo {
             display: block;
@@ -34,6 +36,7 @@
     <a href="index.html"><img src="img/logo.png" alt="Dashboard Logo" class="logo"></a>
     <h4 class="mb-4 text-center">Plant Markers Map</h4>
     <div id="loading-message" style="display: block;">Loading markers... This may take less than a minute when first loaded.</div>
+    <p class="text-center">Pinch to zoom or tap on markers for details.</p>
     <div id="map" class="my-4"></div>
 
     <!-- Leaflet JS -->
@@ -59,8 +62,12 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            // Add marker (for either user or plant location)
-            userMarker = L.marker([lat, lng]).addTo(map).bindPopup(message).openPopup();
+            const userIcon = L.icon({
+                iconUrl: 'img/user-location.png',
+                iconSize: [40, 40]  // Larger size
+            });
+
+            userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map).bindPopup(message).openPopup();
 
             // Fetch plant locations
             fetchPlantLocations();
